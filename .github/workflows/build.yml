@@ -18,19 +18,33 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Install Dependencies
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android SDK & Accept Licenses
+        uses: android-actions/setup-android@v3
+        
+      - name: Accept All Android Licenses
+        run: |
+          yes | sdkmanager --licenses || true
+
+      - name: Install System Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y git zip unzip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev build-essential libsqlite3-dev openjdk-17-jdk
+          sudo apt-get install -y git zip unzip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev build-essential libsqlite3-dev
           pip install --upgrade pip
           pip install buildozer cython virtualenv
 
       - name: Build with Buildozer
         run: |
-          yes | buildozer -v android debug
+          buildozer -v android debug
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: Mustara-AI-APK
           path: bin/*.apk
+          
